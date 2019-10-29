@@ -8,6 +8,25 @@
   </div>
 </template>
 
+<script>
+import axios from 'axios'
+
+export default {
+  mounted() {
+    axios.get('/api/games', {
+    })
+    .then(function (response) {
+      // handle success
+      console.log(response);
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+    })
+  }
+}
+</script>
+
 <style>
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
