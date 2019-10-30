@@ -4,7 +4,7 @@ module.exports = {
   // see https://cli.vuejs.org/config/#devserver-proxy
   devServer: {
     proxy: {
-      '/api': {
+      '^/api': {
         target: 'http://localhost:8080', // mapea las request al puerto 8080
         ws: true,
         changeOrigin: true

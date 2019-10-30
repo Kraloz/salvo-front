@@ -1,0 +1,7 @@
+/* tailwind.css */
+@tailwind base;
+@tailwind components;
+
+@import url('https://fonts.googleapis.com/css?family=Open+Sans|Rubik:500&display=swap');
+
+@tailwind utilities;
