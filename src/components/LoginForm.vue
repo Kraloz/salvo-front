@@ -1,6 +1,6 @@
 <template>
   <div class=" w-full max-w-xs my-auto mx-auto">
-    <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    <form class="bg-white shadow-xl rounded px-8 pt-6 pb-8">
       <div class="mb-4">
         <label class="block left-align text-gray-700 text-sm font-bold mb-4" for="username">
           NickName
@@ -13,35 +13,44 @@
         >
       </div>
       <div class="flex items-center justify-end">
-        <button
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline item-end" type="button"
-          @click="login">
-          Go!
-        </button>
+        <VueLoadingButton
+          :loading="isLoading"
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline item-end"
+          @click.native="login"
+          :styled="false"
+          type="button"
+          aria-label="Login"
+        >Go!</VueLoadingButton>
       </div>
     </form>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import VueLoadingButton from "vue-loading-button"
 
 export default {
   name: "LoginForm",
+  components: {
+    VueLoadingButton,
+  },
   data() {
     return {
-      nickName: ''
+      nickName: '',
+      isLoading: false,
     }
   },
   methods: {
     login() {
-      axios.get(`/api/player/${this.nickName}/game_views`)
-      .then(function (response){
-        console.log(response)
-      })
-    }
+      this.isLoading = true
+      setTimeout(() => {
+        this.$store.dispatch('setNickname', this.nickName)
+        this.$store.dispatch('fetchGameViews')
+          .then(() => {
+            this.isLoading = false
+          })
+      }, 1000)
+    },
   },
-  computed: {
-  }
 }
 </script>
