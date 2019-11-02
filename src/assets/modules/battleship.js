@@ -1,8 +1,9 @@
 /*
     Battleship.js
-    Author: Rogrigo 
+    
+    @Author: Rogrigo Garcia Ribeiro [https://github.com/rodrigr]
+    Adapted: Tomás Aprile [https://github.com/kraloz]
 */
-
 
 
 /*creates the grid structure. It requires a size, an element 
