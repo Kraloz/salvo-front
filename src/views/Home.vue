@@ -1,14 +1,14 @@
 <template>
-  <div class="h-full my-auto flex justify-center">
+  <div class="h-full flex justify-center items-center">
     <login-form
       v-if="!$store.state.gameViews"
-      
     />
     <game-picker
       v-if="$store.state.gameViews"
       :games="$store.state.gameViews"
     />
   </div>
+  
 </template>
 
 <script>
