@@ -1,6 +1,12 @@
 <template>
   <div class=" w-full max-w-3xl my-auto mx-auto">
-    <div class="bg-white shadow-xl rounded px-8 pt-6 pb-8">
+    <div class="bg-white flex flex-col shadow-xl rounded px-8 pt-6 pb-8">
+      <button
+        type="button"
+        class="button self-start"
+        @click="$store.dispatch('logOut')"
+      >Logout
+      </button>
       Select your game:
       <game-card
         v-for="(game, i) in games"
@@ -18,10 +24,10 @@ import GameCard from '@/components/GameCard.vue'
 export default {
   name: "GamePicker",
   components: {
-    GameCard
+    GameCard,
   },
   props: ['games'],
-  methods:{
+  methods: {
     retrieveId(game) {
       let id
       game.gamePlayers.forEach(gp => {
@@ -34,7 +40,7 @@ export default {
     setCurrentGame(game) {
       this.$store.dispatch('setGpIndex', this.retrieveId(game))
       this.$store.dispatch('setCurrentGame', game)
-      this.$router.push({ name: 'game', params: { gpId: game.id }})
+      this.$router.push({ name: 'game'})
     },
   },
 }

@@ -15,7 +15,7 @@
 <script>
 export default {
   name: "GameCard",
-  props: ['created','gamePlayers','gpId'],
+  props: ['created','gamePlayers'],
   data() {
     return {
     }
