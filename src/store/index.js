@@ -27,7 +27,11 @@ export default new Vuex.Store({
   },
   getters: {
     ships: ({currentGame}) => {
-      return currentGame.ships
+      if (currentGame) {
+        return currentGame.ships
+      } else {
+        return null
+      }
     }
   },
   actions: {
@@ -40,6 +44,10 @@ export default new Vuex.Store({
     setCurrentGame({commit}, payload) {
       commit('SET_CURRENT_GAME', payload)
     },
+    logOut({commit}) {
+      commit('SET_GAME_VIEWS', null)
+    },
+
 
     async fetchGameViews({state, commit}) {
       /* defensive shield */
