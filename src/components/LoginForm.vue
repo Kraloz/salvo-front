@@ -41,14 +41,12 @@ export default {
     }
   },
   methods: {
-    login() {
+    async login() {
       this.isLoading = true
-      setTimeout(() => {
-        this.$store.dispatch('setNickname', this.nickName)
-        this.$store.dispatch('fetchGameViews')
-          .then(() => {
-            this.isLoading = false
-          })
+      setTimeout(async () => {
+        await this.$store.dispatch('login', this.nickName)
+        await this.$store.dispatch('fetchGameViews')
+        this.isLoading = false
       }, 1000)
     },
   },
