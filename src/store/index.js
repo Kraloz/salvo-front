@@ -80,15 +80,15 @@ export default new Vuex.Store({
       }
       catch (error) {
         if (error.response) {
-          console.error(error.response.data)
-          console.error(error.response.status)
-          console.error(error.response.headers)
+   //       console.error(error.response.data)
+   //       console.error(error.response.status)
+   //       console.error(error.response.headers)
         } else if (error.request) {
-          console.error(error.request)
+ //         console.error(error.request)
         } else {
-          console.error('Error', error.message)
+//          console.error('Error', error.message)
         }
-        console.error(error)
+//        console.error(error)
       }
     },
     async fetchGameViews({state, commit}) {
@@ -101,15 +101,15 @@ export default new Vuex.Store({
         commit('SET_GAME_VIEWS', response.data)
       } catch (error) {
           if (error.response) {
-            console.error(error.response.data)
-            console.error(error.response.status)
-            console.error(error.response.headers)
+//            console.error(error.response.data)
+  //          console.error(error.response.status)
+    //        console.error(error.response.headers)
           } else if (error.request) {
-            console.error(error.request)
+      //      console.error(error.request)
           } else {
-            console.error('Error', error.message)
+        //    console.error('Error', error.message)
           }
-          console.error(error)
+        //  console.error(error)
       }
     },
   }
