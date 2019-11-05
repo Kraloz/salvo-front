@@ -22,9 +22,9 @@ module.exports = {
       : []
   ]
 }
-// module.exports = {
-//   "plugins": [
-//     require('tailwindcss')('tailwind.js'),
-//     require('autoprefixer')(),
-//   ]
-// }
+module.exports = {
+  "plugins": [
+    require('tailwindcss')('tailwind.js'),
+    require('autoprefixer')(),
+  ]
+}
