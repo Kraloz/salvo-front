@@ -1,6 +1,6 @@
 .flex-container{
   display: flex;
-  flex-flow: column nowrap;
+  /* flex-flow: column nowrap; */
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -20,7 +20,6 @@
   background-size: cover;
   background-repeat: no-repeat;
 }
-
 
 #grid{
   background-image: url('../ocean.gif');
@@ -56,7 +55,6 @@
   text-align: center;
   align-items: center;
 }
-
 
 .grid-cell span{
   
@@ -180,13 +178,13 @@ from, to { border-color: transparent }
 @media only screen and (min-width: 576px){
 
   .flex-container{
-      flex-flow: row-reverse wrap;
+      /* flex-flow: row-reverse wrap; */
   }
 
   #dock{
       width: 175px;
       height: 385px;
-      flex-flow: column-reverse wrap;
+      /* flex-flow: column-reverse wrap; */
       border: 2px solid rgb(128,128,128);
       border-left: 0;
       border-radius: 0 10px 10px 0;
@@ -216,7 +214,7 @@ from, to { border-color: transparent }
 @media only screen and (min-width: 768px){
 
   .flex-container{
-      flex-flow: row-reverse wrap;
+      /* flex-flow: row-reverse wrap; */
   }
 
   #dock{

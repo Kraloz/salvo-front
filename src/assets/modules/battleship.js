@@ -135,12 +135,6 @@ export const createGrid = function(size, element, id) {
     }
 }
 
-// createGrid(11, document.getElementById('grid'), 'ships')
-
-
-
-
-
 export const createShips = function(shipType, length, orientation, parent, isStatic){
 
     let ship = document.createElement('DIV')
