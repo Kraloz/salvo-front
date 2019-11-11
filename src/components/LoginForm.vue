@@ -23,16 +23,23 @@
         >Go!</VueLoadingButton>
       </div>
     </form>
+    <router-link to="/leaderboard" class="flex items-center justify-center block py-1 bg-blue-900 w-full shadow-xl max-w-xs text-white">
+      Leaderboard
+      <v-icon class="ml-2" name="star"/>
+    </router-link>
   </div>
 </template>
 
 <script>
 import VueLoadingButton from "vue-loading-button"
+import 'vue-awesome/icons/star'
+import Icon from 'vue-awesome/components/Icon'
 
 export default {
   name: "LoginForm",
   components: {
     VueLoadingButton,
+    'v-icon': Icon
   },
   data() {
     return {
@@ -52,3 +59,11 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+  form {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+</style>
