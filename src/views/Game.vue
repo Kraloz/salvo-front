@@ -40,10 +40,11 @@ export default {
           battleship.createShips(
             ship.type.toLowerCase(), ship.locations.length,
             this.whatOrientation(ship.locations),
-            document.getElementById(`ships${ship.locations[0]}`), true)
+            document.getElementById(`ships${ship.locations[0]}`),
+            true
+          )
         })
       } else {
-        // Default if no ships deployed
         battleship.setDefaultShips()
       }
     },
@@ -52,8 +53,7 @@ export default {
         this.salvoes.forEach(salvo => {
           if (salvo.player === this.playerId) {
             // Own salvoes
-
-            //después habrá que chequear de manera segura si le pegamos a un enemigo o no
+            // !! Después habrá que chequear de manera segura si le pegamos a un enemigo o no
             salvo.locations.forEach(shot => {
               let cell = document.getElementById(`salvoes${shot}`, false)
               cell.style.backgroundColor = '#1656ee'
@@ -71,9 +71,9 @@ export default {
       }
     },
     checkHit(shot) {
-      for (let i = 0 ; i < this.ships.length ; i++) {
+      for (let i = 0 ; i < this.ships.length ; i++)
         if (this.ships[i].locations.includes(shot)) return true
-      }
+      
       return false
     }
 

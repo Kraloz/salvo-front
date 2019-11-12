@@ -135,7 +135,7 @@ export const createGrid = function(size, element, id) {
     }
 }
 
-export const createShips = function(shipType, length, orientation, parent, isStatic){
+export const createShips = function(shipType, length, orientation, parent, isStatic) {
 
     let ship = document.createElement('DIV')
     let grip = document.createElement('DIV')
