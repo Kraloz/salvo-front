@@ -1,6 +1,6 @@
 <template>
   <div class="w-full max-w-xs my-auto mx-auto">
-    <form class="bg-white shadow-xl rounded px-8 pt-6 pb-8">
+    <form class="bg-white shadow-xl rounded px-8 pt-6 pb-4">
       <div class="mb-4">
         <label class="block left-align text-gray-700 text-sm font-bold mb-4" for="username">
           NickName
@@ -23,7 +23,7 @@
         >Go!</VueLoadingButton>
       </div>
     </form>
-    <router-link to="/leaderboard" class="flex items-center justify-center block py-1 bg-blue-900 w-full shadow-xl max-w-xs text-white">
+    <router-link to="/leaderboard" class="flex items-center justify-center block py-2 bg-blue-900 w-full shadow-xl max-w-xs text-white">
       Leaderboard
       <v-icon class="ml-2" name="star"/>
     </router-link>

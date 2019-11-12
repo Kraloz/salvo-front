@@ -1,6 +1,6 @@
 <template>
   <div class="h-full flex justify-center items-center">
-    <table class="bg-white">
+    <table class="max-w-xl fl-table">
       <thead>
         <tr>
           <th>Nickname</th>
@@ -13,6 +13,7 @@
       <tbody>
         <tr v-for="(player, i) in topPlayers" :key=i>
           <td>{{ player.nickName }}</td>
+          <td>{{ player.total }}</td>
           <td>{{ player.wins }}</td>
           <td>{{ player.draws }}</td>
           <td>{{ player.losses }}</td>
@@ -42,5 +43,5 @@ export default {
 </script>
 
 <style scoped>
-
+  @import '../assets/css/table.css';
 </style>
