@@ -1,8 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
-import Game from '../views/Game.vue'
-import Leaderboard from '../views/Leaderboard.vue'
 
 Vue.use(VueRouter)
 
@@ -10,17 +7,18 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: Home
+    component: () => import(/* webpackChunkName: "home" */ '../views/Home.vue')
+  
   },
   {
     path: '/game',
     name: 'game',
-    component: Game
+    component: () => import(/* webpackChunkName: "game" */ '../views/Game.vue')
   },
   {
     path: '/leaderboard',
     name: 'leaderboard',
-    component: Leaderboard
+    component: () => import(/* webpackChunkName: "leaderboard" */ '../views/Leaderboard.vue')
   }
 ]
 
