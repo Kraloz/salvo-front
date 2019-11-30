@@ -4,7 +4,7 @@
       <button
         type="button"
         class="button self-start"
-        @click="$store.dispatch('logOut')"
+        @click="$store.dispatch('logout')"
       >Logout
       </button>
       Select your game:
@@ -20,14 +20,22 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import GameCard from '@/components/GameCard.vue'
+
 export default {
   name: "GamePicker",
   components: {
     GameCard,
   },
+  created(){
+    this.fetchGameViews()
+  },
   props: ['games'],
   methods: {
+    ...mapActions([
+      'fetchGameViews'
+    ]),
     retrieveId(game) {
       let id
       game.gamePlayers.forEach(gp => {
