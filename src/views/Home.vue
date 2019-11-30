@@ -1,18 +1,17 @@
 <template>
   <div class="h-full flex justify-center items-center">
     <login-form
-      v-if="!$store.state.gameViews"
+      v-if="!loggedIn"
     />
     <game-picker
-      v-if="$store.state.gameViews"
-      :games="$store.state.gameViews"
+      v-if="loggedIn"
     />
   </div>
   
 </template>
 
 <script>
-// @ is an alias to /src
+import { mapGetters } from 'vuex'
 import LoginForm from '@/components/LoginForm.vue'
 import GamePicker from '@/components/GamePicker.vue'
 
@@ -22,7 +21,8 @@ export default {
     LoginForm,
     GamePicker,
   },
-  methods: {
-  },
+  computed: {
+    ...mapGetters(['loggedIn'])
+  }
 }
 </script>
