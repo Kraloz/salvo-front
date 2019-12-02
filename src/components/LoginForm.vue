@@ -7,7 +7,7 @@
       @success="registerSuccess=true"
       class="z-50"
     />
-    <form class="bg-white shadow-xl rounded px-8 pt-6 pb-4">
+    <form @submit.prevent="signin" class="bg-white shadow-xl rounded px-8 pt-6 pb-4">
       <div class="div-errors shadow-md mb-3 bg-green-400 opacity-75" v-if="registerSuccess && !authenticationError">
         <p class="text-green-700 opacity-100">Register Successful!</p>
       </div>
@@ -40,9 +40,8 @@
         <VueLoadingButton
           :loading="isLoading"
           class="button"
-          @click.native="signin"
           :styled="false"
-          type="button"
+          type="submit"
           aria-label="Login"
         >Go!</VueLoadingButton>
       </div>

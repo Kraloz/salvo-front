@@ -31,8 +31,12 @@ const UserService = {
       const response = await ApiService.customRequest(requestData)
       TokenService.saveToken(response.data.accessToken)
       ApiService.setHeader()
-
-      return response.data.accessToken
+      
+      return {
+        accessToken: response.data.accessToken,
+        id: response.data.id,
+        username: response.data.username
+      }
     } catch (error) {
       throw new AuthenticationError(error.response.status, error.response.data.message)
     }

@@ -88,15 +88,14 @@ const actions = {
   async login({ commit }, {username, password}) {
     commit('LOGIN_REQUEST');
     try {
-      const token = await UserService.login(username, password);
-      commit('LOGIN_SUCCESS', token)
-
+      const response = await UserService.login(username, password);
+      commit('LOGIN_SUCCESS', response.accessToken)
+      commit('SET_PLAYER', {id: response.id, username: response.username}, {root: true})
       return true
     } catch (e) {
       if (e instanceof AuthenticationError) {
         commit('LOGIN_ERROR', {errorCode: e.errorCode, errorMessage: e.message})
       }
-      
       return false
     }
   },
@@ -112,10 +111,8 @@ const actions = {
       const response = await UserService.register(email, username, password)
       commit('REGISTER_CLEAN_LOGIN')
       dispatch('registeringToggle', false)
-
       return response
     } catch (e) {
-
       if (e instanceof AuthenticationError) {
         if (!Array.isArray(e.message)) {
           let message = {commonError: e.message}
