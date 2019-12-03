@@ -1,101 +1,119 @@
+import router from '../router/index.js'
 import { ApiService } from '../services/api.service'
 
 const state = {
-    player: {
-      id: null,
-      nickName: null
-    },
-    gameViews: null,
-    gpIndex: null,
-    currentGame: null,
-  }
+  player: {
+    id: '',
+    username: ''
+  },
+  games: null,
+  currentGame: null,
+}
+
 const mutations = {
-    SET_PLAYER(state, player) {
-      state.player = player
-    },
-    SET_GAME_VIEWS(state, status) {
-      state.gameViews = status
-    },
-    SET_CURRENT_GAME(state, game) {
-      state.currentGame = game
-    },
-    SET_GP_INDEX(state, index) {
-      state.gameIndex = index
-    }
+  SET_PLAYER(state, player) {
+    state.player = player
+  },
+  SET_GAMES(state, games) {
+    state.games = games
+  },
+  SET_CURRENT_GAME(state, game) {
+    state.currentGame = game
+  },
+  CLEAR_CURRENT_GAME(state) {
+    state.currentGame = null
   }
+}
+
 const getters = {
-    playerId: ({player}) => {
-      if (player) {
-        return player.id
-      } else {
-        return null
-      }
-    },
-    playerNickName: ({player}) => {
-      if (player) {
-        return player.nickName
-      } else {
-        return null
-      }
-    },
-    ships: ({currentGame}) => {
-      if (currentGame) {
-        return currentGame.ships
-      } else {
-        return null
-      }
-    },
-    salvoes: ({currentGame}) => {
-      if(currentGame) {
-        return currentGame.salvoes
-      } else {
-        return null
-      }
+  playerId: ({player}) => {
+    if (player) {
+      return player.id
+    } else {
+      return null
+    }
+  },
+  username: ({player}) => {
+    if (player) {
+      return player.username
+    } else {
+      return null
+    }
+  },
+  games: ({games}) => {
+    return games
+  },
+  ships: ({currentGame}) => {
+    if (currentGame) {
+      return currentGame.ships
+    } else {
+      return null
+    }
+  },
+  salvoes: ({currentGame}) => {
+    if(currentGame) {
+      return currentGame.salvoes
+    } else {
+      return null
     }
   }
+}
+
+// eslint-disable-next-line no-unused-vars
 const actions = {
-    setGpIndex({commit}, payload) {
-      commit('SET_GP_INDEX', payload)
-    },
-    setCurrentGame({commit}, payload) {
-      commit('SET_CURRENT_GAME', payload)
-    },
+  setCurrentGame({commit}, payload) {
+    commit('SET_CURRENT_GAME', payload)
+  },
 
-    async fetchGameViews() {
-      // {state, commit}
+  async fetchPlayerInfo({ commit }) {
+    try {
+      const response = await ApiService.get('/api/playerInfo')
+      commit('SET_PLAYER', {id: response.data.id, username: response.data.nickName })
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
+  async fetchGames({ commit }) {
+    try {
+      const response = await ApiService.get('/api/games')
+      commit('SET_GAMES', response.data.games)
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
-      // if(!state.player) {
-      //   return
-      // }
+  async createGame({ dispatch }) {
+    try {
+      await ApiService.post('/api/games', {})
+      dispatch('fetchGames')
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
-      try {
-        const response = await ApiService.get('/api/game_view/1')
-        console.log(response)
-      } catch (error) {
-        console.error(error)
-      }
+  async enrollGame({ dispatch }, payload) {
+    try {
+      const response = await ApiService.post(`/api/games/${payload}`);
+      console.log(response)
+      dispatch('fetchGames')
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
-      // try {
-      //   const response = await axios.get(`/api/player/${state.player.nickName}/game_views`)
-      //   commit('SET_GAME_VIEWS', response.data)
-      // } catch (error) {
-      //     if (error.response) {
-      //      console.error(error.response.data)
-      //      console.error(error.response.status)
-      //      console.error(error.response.headers)
-      //     } else if (error.request) {
-      //      console.error(error.request)
-      //     } else {
-      //      console.error('Error', error.message)
-      //     }
-      //    console.error(error)
-    },
+  async fetchGameData({ commit }, payload) {
+    commit('CLEAR_CURRENT_GAME')
+    try {
+      const response = await ApiService.get(`/api/games/${payload}/game_view`)
+      commit('SET_CURRENT_GAME', response.data)
+      router.push('/game')
 
-    // logOut({commit}) {
-    //   commit('SET_GAME_VIEWS', null)
-    // },
+    } catch (error) {
+      console.error(error)
+    }
   }
+}
 
 export const game = {
   // namespaced: true,

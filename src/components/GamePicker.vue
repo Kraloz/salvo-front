@@ -1,26 +1,43 @@
 <template>
   <div class=" w-full max-w-3xl my-auto mx-auto">
     <div class="bg-white flex flex-col shadow-xl rounded px-8 pt-6 pb-8">
-      <button
-        type="button"
-        class="button self-start"
-        @click="$store.dispatch('logout')"
-      >Logout
+      <div class="flex justify-between">
+        <button
+          type="button"
+          class="button"
+          @click="$store.dispatch('logout')"
+        >Logout
+        </button>
+        <button
+          class="button"
+          @click="createGame()"
+        >Create game
       </button>
-      Select your game:
-      <game-card
+      </div>
+      <h1 class="mb-10">Welcome <span class="font-semibold">{{ username }} 👋</span></h1>
+      <p>
+        Select your game:
+      </p>
+      <div class="border border-gray-500 h-96 max-h-full overflow-auto">
+        <game-card
         v-for="(game, i) in games"
         :key="i"
         :created="game.created"
         :gamePlayers="game.gamePlayers"
-        @click.native="setCurrentGame(game)"
+        :isFull="game.full"
+        :gameId="game.id"
+        :alreadyJoined="isAlreadyJoined(game.gamePlayers)"
+        @enrollGame="enrollGame"
+        @joinGame="fetchGameData"
       />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+// @click.native="setCurrentGame(game)"
+import { mapActions, mapGetters } from 'vuex'
 import GameCard from '@/components/GameCard.vue'
 
 export default {
@@ -28,28 +45,23 @@ export default {
   components: {
     GameCard,
   },
-  created(){
-    this.fetchGameViews()
+  beforeMount() {
+    if(!this.username) this.fetchPlayerInfo()
+    this.fetchGames()
   },
-  props: ['games'],
+  computed: {
+    ...mapGetters(['playerId', 'username', 'games'])
+    },
   methods: {
     ...mapActions([
-      'fetchGameViews'
+      'fetchPlayerInfo', 'fetchGames', 'createGame', 'enrollGame', 'fetchGameData'
     ]),
-    retrieveId(game) {
-      let id
-      game.gamePlayers.forEach(gp => {
-        if (gp.player.nickName == this.$store.state.nickName) {
-          id = gp.id
-        }
-      })
-      return id
-    },
-    setCurrentGame(game) {
-      this.$store.dispatch('setGpIndex', this.retrieveId(game))
-      this.$store.dispatch('setCurrentGame', game)
-      this.$router.push({ name: 'game'})
-    },
+
+    isAlreadyJoined(gamePlayers) {
+      let joined = false
+      gamePlayers.forEach(gp => { if(gp.player.id == this.playerId) joined = true })
+      return joined
+    }
   },
 }
 </script>

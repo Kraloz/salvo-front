@@ -30,9 +30,7 @@ export default {
       if (a[0] == b[0]) {
         return 'horizontal'
       }
-      else {
-        return 'vertical'
-      }
+      return 'vertical'
     },
     populateShips() {
       if (this.ships) {
