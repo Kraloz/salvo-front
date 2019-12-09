@@ -43,6 +43,12 @@ const getters = {
   games: ({games}) => {
     return games
   },
+  currentGame: ({currentGame}) => {
+    return currentGame
+  },
+  currentGameId: ({currentGame}) => {
+    return currentGame.id
+  },
   ships: ({currentGame}) => {
     if (currentGame) {
       return currentGame.ships
@@ -112,7 +118,21 @@ const actions = {
     } catch (error) {
       console.error(error)
     }
-  }
+  },
+
+  async refreshGameData({ commit, getters }) {
+    try {
+      const response = await ApiService.get(`/api/games/${getters.currentGameId}/game_view`)
+      commit('SET_CURRENT_GAME', response.data)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  // eslint-disable-next-line no-unused-vars
+  async sendLocations({ commit }, {gameId, locations}) {
+    return await ApiService.post(`/api/games/${gameId}/ships`, locations)
+  },
 }
 
 export const game = {

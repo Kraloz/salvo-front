@@ -6,6 +6,19 @@
   height: 100vh;
 }
 
+.botonera {
+  height: 330px;
+  background-image: url('../dock-texture.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  border: 2px solid rgb(128,128,128);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+}
+.botonera > button {
+  margin: 1rem 0.25rem;
+}
+
 #dock{
   height: 100px;
   width: 330px;
@@ -21,6 +34,7 @@
   background-repeat: no-repeat;
 }
 
+
 #grid{
   background-image: url('../ocean.gif');
   background-size: cover;
@@ -28,9 +42,7 @@
   border-radius: 0 0 10px 10px;
   height: 330px;
   width: 330px;
-  
 }
-
 
 .grid-wrapper{
   display: absolute;
@@ -190,6 +202,11 @@ from, to { border-color: transparent }
       border-radius: 0 10px 10px 0;
   }
 
+  .botonera {
+    height: 385px;
+  }
+  
+
   #display{
       height: 50px;
   }
@@ -224,6 +241,10 @@ from, to { border-color: transparent }
       border: 2px solid rgb(128,128,128);
       border-left: 0;
       border-radius: 0 10px 10px 0;
+  }
+
+  .botonera {
+    height: 495px;
   }
 
   #display{

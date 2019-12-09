@@ -23,6 +23,14 @@
   /* @apply items-end; */
 }
 
+.button:disabled,
+.button[disabled] {
+  border: 0.5px solid #999999;
+  @apply bg-gray-500;
+  @apply text-gray-700;
+  /* color: #666666; */
+}
+
 .input {
   @apply shadow;
   @apply border-gray-400;
@@ -80,6 +88,5 @@
   @apply font-bold;
   @apply mb-2;
 }
-
 
 @tailwind utilities;
