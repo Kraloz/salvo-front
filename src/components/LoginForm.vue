@@ -45,7 +45,7 @@
           aria-label="Login"
         >Go!</VueLoadingButton>
       </div>
-      <p class="mt-3">Don't hace an account?
+      <p class="mt-3">Don't have an account?
         <button
           class="underline"
           @click="registeringToggle(true)"

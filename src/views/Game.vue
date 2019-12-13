@@ -13,7 +13,7 @@
         type="button"
         >Deploy Ships
       </button>
-      <button class="button" type="button ">Shoot!</button>
+      <button @click="fireSalvo" :disabled="this.shotsLocations.length<5" class="button" type="button ">Shoot!</button>
     </div>
     <div id="grid" ref="grid" class="order-first">
       <!--The grid will appear here -->
@@ -34,6 +34,7 @@ export default {
   data() {
     return {
       shipTypes: ['carrier', 'battleship', 'submarine', 'destroyer', 'patrol_boat'],
+      shotsLocations: [],
       shipsInDock: 0,
     }
   },
@@ -42,9 +43,9 @@ export default {
       'playerId',
       'ships',
       'salvoes',
-      'currentGameId'
+      'currentGameId',
+      'shotList'
     ]),
-
     isShipsLeftInDock() {
       return this.shipsInDock == 0
     },
@@ -52,6 +53,7 @@ export default {
       return this.ships.length == 0
     }
   },
+
   mounted() {
     // Creating grids
     battleship.createGrid(11, document.getElementById('grid'), 'ships')
@@ -59,6 +61,8 @@ export default {
     this.populateShips()
     this.populateSalvoes()
     
+    this.enableClickSalvoesGrid()
+
     if (this.needDeploy) {
 
     /* SHIPS dock REACTIVITY */
@@ -78,13 +82,12 @@ export default {
   beforeDestroy() {
     if (observer) observer.disconnect()
   },
+
   methods: {
-    ...mapActions(['sendLocations, refreshGameData']),
+    ...mapActions(['sendShipsLocations, refreshGameData']),
 
     countShipsInDock() { // this updates data.shipsInDock making it "reactive"
       this.shipsInDock = this.$refs.dock.getElementsByClassName('grid-item').length
-      console.log('Need deploy ? ', this.needDeploy)
-      console.log('Ships in dock :', this.shipsInDock)
     },
     populateShips() {
       if (Array.isArray(this.ships) && this.ships.length>0) {
@@ -139,9 +142,38 @@ export default {
       }
       return 'vertical'
     },
+    enableClickSalvoesGrid() {
+      const cells = this.$refs.salvoes.getElementsByClassName('grid-cell')
+
+      Array.from(cells).forEach( e => {
+        if (!e.hasAttribute('data-y'))
+          return
+
+        e.addEventListener('click', e => {
+          if (this.shotsLocations.length < 5) {
+            let location = `${e.target.dataset.y}${e.target.dataset.x}`
+            // Checks if the selected cell was already fired
+            if (!this.shotList.includes(location)) {
+              // Tracks the fired location and changes it's color
+              this.shotsLocations.push(`${e.target.dataset.y}${e.target.dataset.x}`)
+              e.target.style.backgroundColor = "rgba(231, 245, 125, 0.5)"
+            } else {
+              this.$refs.display.firstChild.textContent = "Can't fire in the same place!"
+            }
+          } else {
+            this.$refs.display.firstChild.textContent = "Run out of ammo!"
+          }
+        })
+      })
+
+    },
+    // ajax
     async deployShips() {
       try {
-        await this.$store.dispatch('sendLocations', {gameId: this.currentGameId, locations: this.getPlacedShips()})
+        await this.$store.dispatch('sendShipsLocations', {
+          gameId: this.currentGameId,
+          locations: this.getPlacedShips()
+        })
         
         await this.$store.dispatch('refreshGameData')
 
@@ -155,7 +187,24 @@ export default {
       } catch (e) {
         console.error(e)
       }
-    }
+    },
+    async fireSalvo() {
+      try {
+        await this.$store.dispatch('sendSalvoLocations', {
+          gameId: this.currentGameId,
+          locations: this.shotsLocations
+        })
+
+        await this.$store.dispatch('refreshGameData')
+        // Refres salvoes grid
+        this.populateSalvoes()
+        // Cleans up shots locations
+        this.shotsLocations = []
+
+      } catch (e) {
+        console.error(e)
+      }
+    },
   }
 }
 </script>

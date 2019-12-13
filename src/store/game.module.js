@@ -62,6 +62,13 @@ const getters = {
     } else {
       return null
     }
+  },
+  shotList: ({currentGame}) => {
+    if (currentGame) {
+      let coso = []
+      currentGame.salvoes.forEach(e => coso.push(...e.locations))
+      return coso
+    }
   }
 }
 
@@ -130,8 +137,13 @@ const actions = {
   },
 
   // eslint-disable-next-line no-unused-vars
-  async sendLocations({ commit }, {gameId, locations}) {
+  async sendShipsLocations({ commit }, {gameId, locations}) {
     return await ApiService.post(`/api/games/${gameId}/ships`, locations)
+  },
+
+  // eslint-disable-next-line no-unused-vars
+  async sendSalvoLocations({ commit }, {gameId, locations}) {
+    return await ApiService.post(`/api/games/${gameId}/salvoes`, locations)
   },
 }
 
