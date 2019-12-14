@@ -44,7 +44,8 @@ export default {
       'ships',
       'salvoes',
       'currentGameId',
-      'shotList'
+      'gameShotList',
+      'gameShipsLocations'
     ]),
     isShipsLeftInDock() {
       return this.shipsInDock == 0
@@ -104,23 +105,22 @@ export default {
       }
     },
     populateSalvoes() {
-      if (this.salvoes) {
-        this.salvoes.forEach(salvo => {
-          if (salvo.player === this.playerId) {
-            // Own salvoes
-            // !! Después habrá que chequear de manera segura si le pegamos a un enemigo o no
-            salvo.locations.forEach(shot => {
-              let cell = document.getElementById(`salvoes${shot}`, false)
-              cell.style.backgroundColor = '#1656ee'
-            })
-          } else {
-            // Enemy salvoes
-            salvo.locations.forEach(shot => {
-              if (this.checkHit(shot)) {
-                let cell = document.getElementById(`ships${shot}`, false)
-                cell.style.backgroundColor = 'red'
-              }
-            })
+      if (!this.salvoes) {
+        return
+      }
+     
+     if (this.gameShotList.shots) {
+        this.gameShotList.shots.forEach(shot => {
+          let cell = document.getElementById(`salvoes${shot}`)
+          cell.style.backgroundColor = '#1656ee'
+        })
+      }
+
+      if (this.gameShotList.enemyShots) {
+        this.gameShotList.enemyShots.forEach(shot => {
+          if(this.gameShipsLocations.includes(shot)) {
+            let cell = document.getElementById(`ships${shot}`)
+            cell.style.backgroundColor = 'red'
           }
         })
       }
@@ -152,11 +152,12 @@ export default {
         e.addEventListener('click', e => {
           if (this.shotsLocations.length < 5) {
             let location = `${e.target.dataset.y}${e.target.dataset.x}`
-            // Checks if the selected cell was already fired
-            if (!this.shotList.includes(location)) {
+            
+          // Checks if the selected cell was already fired
+            if (!this.gameShotList.shots.includes(location)) {
               // Tracks the fired location and changes it's color
-              this.shotsLocations.push(`${e.target.dataset.y}${e.target.dataset.x}`)
               e.target.style.backgroundColor = "rgba(231, 245, 125, 0.5)"
+              this.shotsLocations.push(location)
             } else {
               this.$refs.display.firstChild.textContent = "Can't fire in the same place!"
             }
@@ -165,8 +166,8 @@ export default {
           }
         })
       })
-
     },
+
     // ajax
     async deployShips() {
       try {
@@ -188,6 +189,7 @@ export default {
         console.error(e)
       }
     },
+
     async fireSalvo() {
       try {
         await this.$store.dispatch('sendSalvoLocations', {

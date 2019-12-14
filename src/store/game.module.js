@@ -57,27 +57,49 @@ const getters = {
     }
   },
   salvoes: ({currentGame}) => {
-    if(currentGame) {
+    if (currentGame) {
       return currentGame.salvoes
     } else {
       return null
     }
   },
-  shotList: ({currentGame}) => {
+  
+  gameShipsLocations: ({currentGame},) => {
     if (currentGame) {
-      let coso = []
-      currentGame.salvoes.forEach(e => coso.push(...e.locations))
-      return coso
+      // eslint-disable-next-line no-unused-vars
+      const locations = []
+      currentGame.ships.forEach(ship => {
+        locations.push(...ship.locations.flat())
+      })
+      
+      return locations
     }
-  }
-}
+    
+  },
+  
+  gameShotList: ({currentGame}, getters) => {
+    if (currentGame) {
+      const shots = []
+      const enemyShots = []
 
+      currentGame.salvoes.forEach(e => {
+        if (e.player == getters.playerId) {
+          shots.push(...e.locations)
+        } else if (e.palyer != getters.playerId) {
+          enemyShots.push(...e.locations)
+        }
+      })
+      
+      return { shots, enemyShots }
+    }
+  },
+}
 // eslint-disable-next-line no-unused-vars
 const actions = {
   setCurrentGame({commit}, payload) {
     commit('SET_CURRENT_GAME', payload)
   },
-
+  
   async fetchPlayerInfo({ commit }) {
     try {
       const response = await ApiService.get('/api/playerInfo')
@@ -86,7 +108,7 @@ const actions = {
       console.error(error)
     }
   },
-
+  
   async fetchGames({ commit }) {
     try {
       const response = await ApiService.get('/api/games')
@@ -95,7 +117,7 @@ const actions = {
       console.error(error)
     }
   },
-
+  
   async createGame({ dispatch }) {
     try {
       await ApiService.post('/api/games', {})
@@ -104,7 +126,7 @@ const actions = {
       console.error(error)
     }
   },
-
+  
   async enrollGame({ dispatch }, payload) {
     try {
       const response = await ApiService.post(`/api/games/${payload}`);
@@ -114,19 +136,19 @@ const actions = {
       console.error(error)
     }
   },
-
+  
   async fetchGameData({ commit }, payload) {
     commit('CLEAR_CURRENT_GAME')
     try {
       const response = await ApiService.get(`/api/games/${payload}/game_view`)
       commit('SET_CURRENT_GAME', response.data)
       router.push('/game')
-
+      
     } catch (error) {
       console.error(error)
     }
   },
-
+  
   async refreshGameData({ commit, getters }) {
     try {
       const response = await ApiService.get(`/api/games/${getters.currentGameId}/game_view`)
@@ -135,12 +157,12 @@ const actions = {
       console.error(error)
     }
   },
-
+  
   // eslint-disable-next-line no-unused-vars
   async sendShipsLocations({ commit }, {gameId, locations}) {
     return await ApiService.post(`/api/games/${gameId}/ships`, locations)
   },
-
+  
   // eslint-disable-next-line no-unused-vars
   async sendSalvoLocations({ commit }, {gameId, locations}) {
     return await ApiService.post(`/api/games/${gameId}/salvoes`, locations)
