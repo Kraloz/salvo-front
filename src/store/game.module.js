@@ -26,76 +26,89 @@ const mutations = {
 }
 
 const getters = {
-  playerId: ({player}) => {
-    if (player) {
-      return player.id
-    } else {
-      return null
-    }
-  },
-  username: ({player}) => {
-    if (player) {
-      return player.username
-    } else {
-      return null
-    }
-  },
-  games: ({games}) => {
-    return games
-  },
-  currentGame: ({currentGame}) => {
-    return currentGame
-  },
-  currentGameId: ({currentGame}) => {
-    return currentGame.id
-  },
-  ships: ({currentGame}) => {
-    if (currentGame) {
-      return currentGame.ships
-    } else {
-      return null
-    }
-  },
-  salvoes: ({currentGame}) => {
-    if (currentGame) {
-      return currentGame.salvoes
-    } else {
-      return null
-    }
-  },
-  
-  gameShipsLocations: ({currentGame},) => {
-    if (currentGame) {
-      // eslint-disable-next-line no-unused-vars
-      const locations = []
-      currentGame.ships.forEach(ship => {
-        locations.push(...ship.locations.flat())
-      })
-      
-      return locations
-    }
-    
-  },
-  
-  gameShotList: ({currentGame}, getters) => {
-    if (currentGame) {
-      const shots = []
-      const enemyShots = []
 
-      currentGame.salvoes.forEach(e => {
-        if (e.player == getters.playerId) {
-          shots.push(...e.locations)
-        } else if (e.palyer != getters.playerId) {
-          enemyShots.push(...e.locations)
-        }
-      })
-      
-      return { shots, enemyShots }
+  // 1 para cada salvo
+  hits: ({currentGame, player}) => {
+    if (!currentGame) return undefined
+    if (!currentGame.salvoes) return undefined
+
+    const ownSalvoes = currentGame.salvoes
+        .filter(salvo => salvo.player == player.id)
+        .map(salvo => salvo.hits).flat()
+    const enemySalvoes = currentGame.salvoes
+        .filter(salvo => salvo.player != player.id)
+        .map(salvo => salvo.hits).flat()
+
+    return {myHits: ownSalvoes, enemyHits: enemySalvoes}
+  },
+
+  // todos los sinks hasta el turno del último salvo
+  sinks: ({currentGame, player}, getters) => {
+    if (!currentGame) return null
+    if (!currentGame.salvoes.length) return null
+
+    const myLastSalvo = (!getters.gameShotList.ownShots.length) ? [] :
+      currentGame.salvoes
+        .filter(salvo => salvo.player == player.id)
+        .reduce((prev, current) => (prev.turn > current.turn) ? prev : current)
+
+    const enemyLastSalvo = (!getters.gameShotList.enemyShots.length) ? [] :
+     currentGame.salvoes
+        .filter(salvo => salvo.player != player.id)
+        .reduce((prev, current) => (prev.turn > current.turn) ? prev : current)
+
+    return {mySinks: myLastSalvo.sinks, enemySinks: enemyLastSalvo.sinks}
+  },
+
+  gameShipsLocations: ({currentGame}) => {
+    if (!currentGame) return undefined
+
+    const locations = []
+    currentGame.ships.forEach(ship => {
+      locations.push(...ship.locations.flat())
+    })
+    return locations
+  },
+  
+  gameShotList: ({currentGame, player}) => {
+    if (!currentGame) return undefined
+
+    const ownShots = []
+    const enemyShots = []
+
+    currentGame.salvoes.forEach(e => {
+      if (e.player == player.id) {
+        ownShots.push(...e.locations)
+      } else if (e.palyer != player.id) {
+        enemyShots.push(...e.locations)
+      }
+    })
+    return { ownShots, enemyShots }
+  },
+
+  currentTurn: ({currentGame, player}) => {
+    if (!currentGame) return undefined
+    
+    var arr = []
+    var turn = 0;
+
+    currentGame.salvoes.map(salvo => {
+      if (salvo.player == player.id) {
+      arr.push(salvo.turn);
+      }
+    })
+    turn = Math.max.apply(Math, arr);
+    
+    if (turn == -Infinity) {
+      return 1;
+    } else {
+      return turn + 1;
     }
   },
 }
-// eslint-disable-next-line no-unused-vars
+
 const actions = {
+  // eslint-disable-next-line no-unused-vars
   setCurrentGame({commit}, payload) {
     commit('SET_CURRENT_GAME', payload)
   },
@@ -129,8 +142,7 @@ const actions = {
   
   async enrollGame({ dispatch }, payload) {
     try {
-      const response = await ApiService.post(`/api/games/${payload}`);
-      console.log(response)
+      await ApiService.post(`/api/games/${payload}`);
       dispatch('fetchGames')
     } catch (error) {
       console.error(error)
@@ -149,9 +161,9 @@ const actions = {
     }
   },
   
-  async refreshGameData({ commit, getters }) {
+  async refreshGameData({ commit, state }) {
     try {
-      const response = await ApiService.get(`/api/games/${getters.currentGameId}/game_view`)
+      const response = await ApiService.get(`/api/games/${state.currentGame.id}/game_view`)
       commit('SET_CURRENT_GAME', response.data)
     } catch (error) {
       console.error(error)
@@ -159,13 +171,13 @@ const actions = {
   },
   
   // eslint-disable-next-line no-unused-vars
-  async sendShipsLocations({ commit }, {gameId, locations}) {
-    return await ApiService.post(`/api/games/${gameId}/ships`, locations)
+  async sendShipsLocations({ state }, {gameId, locations}) {
+    return await ApiService.post(`/api/games/${state.currentGame.id}/ships`, locations)
   },
   
   // eslint-disable-next-line no-unused-vars
-  async sendSalvoLocations({ commit }, {gameId, locations}) {
-    return await ApiService.post(`/api/games/${gameId}/salvoes`, locations)
+  async sendSalvoLocations({ state }, {gameId, shots, turn}) {
+    return await ApiService.post(`/api/games/${state.currentGame.id}/salvoes`, {shots, turn})
   },
 }
 

@@ -1,5 +1,8 @@
 <template>
-  <div :key="currentGameId" class="flex-container">
+  <div :key="currentGame.id" class="flex-container">
+    <div class="absolute bg-red-500 w-64 h-20 flex text-center items-center z-" v-if="currentGame.status == 'CREATED'">
+      <p class="loading-ellipsis ml-8 text-xl ">Waiting for opponent</p>
+    </div>
     <div id="dock" ref="dock" class="order-1">
       <div id="display" ref="display"><p>Welcome...</p></div><!--The new ships will show up here, waiting for been placed in the grid -->
     </div>
@@ -8,7 +11,7 @@
       <button
         v-if="needDeploy"
         class="button"
-        :disabled="!isShipsLeftInDock"
+        :disabled="(!isShipsLeftInDock || currentGame.status != 'PREPARE')"
         @click="deployShips"
         type="button"
         >Deploy Ships
@@ -26,7 +29,7 @@
 
 <script>
 import * as battleship from '@/assets/modules/battleship.js'
-import { mapActions, mapGetters } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
 
 let observer = null
 export default {
@@ -39,13 +42,17 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      currentGame: state => state.game.currentGame,
+      ships: state => state.game.currentGame.ships,
+      salvoes: state => state.game.currentGame.salvoes
+    }),
     ...mapGetters([
-      'playerId',
-      'ships',
-      'salvoes',
-      'currentGameId',
+      'hits',
+      'sinks',
       'gameShotList',
-      'gameShipsLocations'
+      'gameShipsLocations',
+      'currentTurn',
     ]),
     isShipsLeftInDock() {
       return this.shipsInDock == 0
@@ -54,7 +61,6 @@ export default {
       return this.ships.length == 0
     }
   },
-
   mounted() {
     // Creating grids
     battleship.createGrid(11, document.getElementById('grid'), 'ships')
@@ -83,7 +89,6 @@ export default {
   beforeDestroy() {
     if (observer) observer.disconnect()
   },
-
   methods: {
     ...mapActions(['sendShipsLocations, refreshGameData']),
 
@@ -96,7 +101,7 @@ export default {
           battleship.createShips(
             ship.type.toLowerCase(), ship.locations.length,
             this.whatOrientation(ship.locations),
-            document.getElementById(`ships${ship.locations[0]}`),
+            document.getElementById(`ships${ship.locations.sort()[0]}`),
             true
           )
         })
@@ -105,29 +110,56 @@ export default {
       }
     },
     populateSalvoes() {
-      if (!this.salvoes) {
-        return
-      }
-     
-     if (this.gameShotList.shots) {
-        this.gameShotList.shots.forEach(shot => {
+      if (!this.salvoes) return
+
+      // populate all my shots
+      if (this.gameShotList.ownShots) {
+        this.gameShotList.ownShots.forEach(shot => {
           let cell = document.getElementById(`salvoes${shot}`)
           cell.style.backgroundColor = '#1656ee'
         })
       }
 
-      if (this.gameShotList.enemyShots) {
-        this.gameShotList.enemyShots.forEach(shot => {
-          if(this.gameShipsLocations.includes(shot)) {
-            let cell = document.getElementById(`ships${shot}`)
+      if (this.hits) {
+        // populate enemy hits on my ships
+        if (this.hits.enemyHits != null) {
+          this.hits.enemyHits.forEach(hit => {
+              let cell = document.getElementById(`ships${hit}`)
+              cell.style.backgroundColor = 'red'
+          })
+        }
+        // populate my hits on enemy ships
+        if (this.hits.myHits != null) {
+          this.hits.myHits.forEach(hit => {
+            let cell = document.getElementById(`salvoes${hit}`)
             cell.style.backgroundColor = 'red'
-          }
-        })
+          })
+        }
       }
-    },
-    checkHit(shot) {
-      for (let i = 0 ; i < this.ships.length ; i++)
-        return this.ships[i].locations.includes(shot)
+
+      if (this.sinks) {
+        // show enemy boats that sunk
+        if (this.sinks.mySinks != null) {
+          this.sinks.mySinks.forEach(sink => {
+            sink.locations.forEach(coord => {
+              let cell = document.getElementById(`salvoes${coord}`)
+              cell.innerText = 'X'
+              cell.classList.add('justify-center')
+            })
+          })
+        }
+        // show if my boats have been sunk
+        if (this.sinks.enemySinks != null) {
+          this.sinks.enemySinks.forEach(sink => {
+            sink.locations.forEach(coord => {
+              let cell = document.getElementById(`ships${coord}`)
+              cell.innerText = 'X'
+              cell.classList.add('justify-center')
+            })
+          })
+        }
+      }
+
     },
     getPlacedShips() {
       return this.shipTypes.map(shipType => {
@@ -152,15 +184,17 @@ export default {
         e.addEventListener('click', e => {
           if (this.shotsLocations.length < 5) {
             let location = `${e.target.dataset.y}${e.target.dataset.x}`
-            
-          // Checks if the selected cell was already fired
-            if (!this.gameShotList.shots.includes(location)) {
-              // Tracks the fired location and changes it's color
-              e.target.style.backgroundColor = "rgba(231, 245, 125, 0.5)"
-              this.shotsLocations.push(location)
-            } else {
-              this.$refs.display.firstChild.textContent = "Can't fire in the same place!"
+            if (this.currentGame.status == 'COURSE') {
+              // Checks if the selected cell was already fired
+              if (!this.gameShotList.ownShots.includes(location) && !this.shotsLocations.includes(location)) {
+                // Tracks the fired location and changes it's color
+                e.target.style.backgroundColor = "rgba(231, 245, 125, 0.5)"
+                this.shotsLocations.push(location)
+              } else {
+                this.$refs.display.firstChild.textContent = "Can't fire in the same place!"
+              }
             }
+
           } else {
             this.$refs.display.firstChild.textContent = "Run out of ammo!"
           }
@@ -172,7 +206,7 @@ export default {
     async deployShips() {
       try {
         await this.$store.dispatch('sendShipsLocations', {
-          gameId: this.currentGameId,
+          gameId: this.currentGame.id,
           locations: this.getPlacedShips()
         })
         
@@ -189,12 +223,12 @@ export default {
         console.error(e)
       }
     },
-
     async fireSalvo() {
       try {
         await this.$store.dispatch('sendSalvoLocations', {
-          gameId: this.currentGameId,
-          locations: this.shotsLocations
+          gameId: this.currentGame.id,
+          shots: this.shotsLocations,
+          turn: this.currentTurn
         })
 
         await this.$store.dispatch('refreshGameData')

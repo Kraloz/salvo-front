@@ -37,7 +37,7 @@
 
 <script>
 // @click.native="setCurrentGame(game)"
-import { mapActions, mapGetters } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import GameCard from '@/components/GameCard.vue'
 
 export default {
@@ -50,8 +50,13 @@ export default {
     this.fetchGames()
   },
   computed: {
-    ...mapGetters(['playerId', 'username', 'games'])
-    },
+    ...mapState({
+      games: state => state.game.games,
+      username: state => state.game.player.username,
+      playerId: state => state.game.player.id
+    
+    })
+  },
   methods: {
     ...mapActions([
       'fetchPlayerInfo', 'fetchGames', 'createGame', 'enrollGame', 'fetchGameData'

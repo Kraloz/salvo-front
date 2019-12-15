@@ -123,7 +123,7 @@ from, to { border-color: transparent }
 50% { border-color: rgb(0, 255, 0); }
 }
 
-.grid p {
+.grip {
   position: absolute;
   z-index: 99;
   left: 5px;

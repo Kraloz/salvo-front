@@ -58,30 +58,6 @@ const getters = {
   loggedIn: (state) => {
     return state.accessToken ? true : false
   },
-  
-  authenticationErrorCode: (state) => {
-    return state.authenticationErrorCode
-  },
-  
-  authenticationError: (state) => {
-    return state.authenticationError
-  },
-  
-  authenticating: (state) => {
-    return state.authenticating
-  },
-
-  registerErrorCode: (state) => {
-    return state.registerErrorCode
-  },
-  
-  registerErrors: (state) => {
-    return state.registerError
-  },
-
-  registering: (state ) => {
-    return state.registering
-  }
 }
 
 const actions = {
@@ -136,7 +112,6 @@ const actions = {
 
 
   logout({ commit }) {
-    console.log('loggin out...')
     UserService.logout()
     commit('LOGOUT_SUCCESS')
   }

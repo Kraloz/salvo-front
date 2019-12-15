@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import Icon from 'vue-awesome/components/Icon'
 import 'vue-awesome/icons/times-circle'
 
@@ -78,9 +78,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'registerErrors'
-    ]),
+    ...mapState({
+      registerErrors: state => state.auth.registerError,
+      authenticationError: state => state.auth.authenticationError,
+      registering: state => state.auth.registering
+    }),
   },
   methods: {
     ...mapActions([

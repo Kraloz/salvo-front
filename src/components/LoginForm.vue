@@ -66,7 +66,7 @@ import VueLoadingButton from "vue-loading-button"
 import Icon from 'vue-awesome/components/Icon'
 import 'vue-awesome/icons/star'
 
-import { mapActions, mapGetters } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: "LoginForm",
@@ -84,9 +84,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'authenticationError', 'registering'
-    ])
+    ...mapState({
+      registerErrors: state => state.auth.registerError,
+      authenticationError: state => state.auth.authenticationError,
+      registering: state => state.auth.registering
+    })
   },
   methods: {
     ...mapActions([
