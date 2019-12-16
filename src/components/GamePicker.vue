@@ -1,5 +1,6 @@
 <template>
   <div class=" w-full max-w-3xl my-auto mx-auto">
+    <interval :delay=1500 @tick="$store.dispatch('fetchGames')"/>
     <div class="bg-white flex flex-col shadow-xl rounded px-8 pt-6 pb-8">
       <div class="flex justify-between">
         <button
@@ -36,17 +37,20 @@
 </template>
 
 <script>
-// @click.native="setCurrentGame(game)"
 import { mapState, mapActions } from 'vuex'
+import Interval from '@/components/Interval.vue'
 import GameCard from '@/components/GameCard.vue'
 
 export default {
   name: "GamePicker",
   components: {
     GameCard,
+    Interval
+  },
+  mounted() {
   },
   beforeMount() {
-    if(!this.username) this.fetchPlayerInfo()
+    if (!this.username) this.fetchPlayerInfo()
     this.fetchGames()
   },
   computed: {

@@ -1,7 +1,8 @@
 <template>
   <div :key="currentGame.id" class="flex-container">
-    <div class="absolute bg-red-500 w-64 h-20 flex text-center items-center z-" v-if="currentGame.status == 'CREATED'">
-      <p class="loading-ellipsis ml-8 text-xl ">Waiting for opponent</p>
+    <interval :delay=3000 @tick="refreshSalvoes"/>
+    <div class="absolute bg-red-500 w-64 h-20 flex text-center items-center z-100" v-if="currentGame.status == 'CREATED' || !(this.currentTurn <= this.enemyTurn)">
+      <p class="loading-ellipsis ml-8 text-xl">Waiting for opponent</p>
     </div>
     <div id="dock" ref="dock" class="order-1">
       <div id="display" ref="display"><p>Welcome...</p></div><!--The new ships will show up here, waiting for been placed in the grid -->
@@ -16,7 +17,7 @@
         type="button"
         >Deploy Ships
       </button>
-      <button @click="fireSalvo" :disabled="this.shotsLocations.length<5" class="button" type="button ">Shoot!</button>
+      <button @click="fireSalvo" :disabled="canFire" class="button" type="button ">Shoot!</button>
     </div>
     <div id="grid" ref="grid" class="order-first">
       <!--The grid will appear here -->
@@ -30,6 +31,7 @@
 <script>
 import * as battleship from '@/assets/modules/battleship.js'
 import { mapState, mapActions, mapGetters } from 'vuex'
+import Interval from '@/components/Interval.vue'
 
 let observer = null
 export default {
@@ -40,6 +42,9 @@ export default {
       shotsLocations: [],
       shipsInDock: 0,
     }
+  },
+  components: {
+    Interval
   },
   computed: {
     ...mapState({
@@ -53,13 +58,17 @@ export default {
       'gameShotList',
       'gameShipsLocations',
       'currentTurn',
+      'enemyTurn'
     ]),
     isShipsLeftInDock() {
       return this.shipsInDock == 0
     },
     needDeploy() {
       return this.ships.length == 0
-    }
+    },
+    canFire() {
+      return (!(this.currentTurn <= this.enemyTurn) || this.shotsLocations.length<5)
+    },
   },
   mounted() {
     // Creating grids
@@ -71,19 +80,17 @@ export default {
     this.enableClickSalvoesGrid()
 
     if (this.needDeploy) {
-
-    /* SHIPS dock REACTIVITY */
-    this.countShipsInDock() // initialization of this.shipsInDock
-
-    // eslint-disable-next-line no-unused-vars
-    observer = new MutationObserver((mutationsList, observer) => {
-      for (let mutation of mutationsList) {
-        if (mutation.type === 'childList') {
-          this.countShipsInDock() // update value of this.shipsInDock
+      /* SHIPS dock REACTIVITY */
+      this.countShipsInDock() // initialization of this.shipsInDock
+      // eslint-disable-next-line no-unused-vars
+      observer = new MutationObserver((mutationsList, observer) => {
+        for (let mutation of mutationsList) {
+          if (mutation.type === 'childList') {
+            this.countShipsInDock() // update value of this.shipsInDock
+          }
         }
-      }
-    })
-    observer.observe(this.$refs.dock, {childList: true})
+      })
+      observer.observe(this.$refs.dock, {childList: true})
     }
   },
   beforeDestroy() {
@@ -99,8 +106,9 @@ export default {
       if (Array.isArray(this.ships) && this.ships.length>0) {
         this.ships.forEach(ship => {
           battleship.createShips(
-            ship.type.toLowerCase(), ship.locations.length,
-            this.whatOrientation(ship.locations),
+            ship.type.toLowerCase(),
+            ship.locations.length,
+            this.whatOrientation(ship.locations.sort()),
             document.getElementById(`ships${ship.locations.sort()[0]}`),
             true
           )
@@ -201,7 +209,6 @@ export default {
         })
       })
     },
-
     // ajax
     async deployShips() {
       try {
@@ -219,6 +226,14 @@ export default {
         battleship.createGrid(11, document.getElementById('grid'), 'ships')
         this.populateShips()
 
+      } catch (e) {
+        console.error(e)
+      }
+    },
+    async refreshSalvoes() {
+      try {
+        await this.$store.dispatch('refreshGameData')
+        this.populateSalvoes()
       } catch (e) {
         console.error(e)
       }

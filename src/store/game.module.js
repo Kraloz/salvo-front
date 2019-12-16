@@ -87,7 +87,8 @@ const getters = {
   },
 
   currentTurn: ({currentGame, player}) => {
-    if (!currentGame) return undefined
+    if (!currentGame) return null
+    // if (!currentGame.salvoes.length) return null
     
     var arr = []
     var turn = 0;
@@ -97,13 +98,35 @@ const getters = {
       arr.push(salvo.turn);
       }
     })
+
     turn = Math.max.apply(Math, arr);
-    
-    if (turn == -Infinity) {
-      return 1;
-    } else {
-      return turn + 1;
-    }
+    return (turn == -Infinity) ? 1 : turn + 1
+    // if (turn == -Infinity) {
+    //   return 1;
+    // } else {
+    //   return turn + 1;
+    // }
+  },
+  enemyTurn: ({currentGame, player}) => {
+    if (!currentGame) return null
+    // if (!currentGame.salvoes.length) return null
+
+    var arr = []
+    var turn = 0;
+
+    currentGame.salvoes.map(salvo => {
+      if (salvo.player != player.id) {
+      arr.push(salvo.turn);
+      }
+    })
+
+    turn = Math.max.apply(Math, arr);
+    return (turn == -Infinity) ? 1 : turn + 1
+    // if (turn == -Infinity) {
+    //   return 1;
+    // } else {
+    //   return turn + 1;
+    // }
   },
 }
 
