@@ -98,13 +98,14 @@ export default {
   },
   methods: {
     ...mapActions(['sendShipsLocations, refreshGameData']),
-
+    
     countShipsInDock() { // this updates data.shipsInDock making it "reactive"
       this.shipsInDock = this.$refs.dock.getElementsByClassName('grid-item').length
     },
     populateShips() {
       if (Array.isArray(this.ships) && this.ships.length>0) {
         this.ships.forEach(ship => {
+          console.log(ship.locations)
           battleship.createShips(
             ship.type.toLowerCase(),
             ship.locations.length,
@@ -170,11 +171,12 @@ export default {
 
     },
     getPlacedShips() {
-      return this.shipTypes.map(shipType => {
+      const gotShips = this.shipTypes.map(shipType => {
         let cellsShip = this.$refs.grid.getElementsByClassName(`${shipType}-busy-cell`)
         let locations = Array.from(cellsShip).map(coord => `${coord.dataset.y}${coord.dataset.x}`)
         return {type: shipType.toUpperCase(), cells: locations}
       })
+      return (gotShips.length != 5) ? undefined : gotShips
     },
     whatOrientation([a, b]) {
       if (a[0] == b[0]) {
