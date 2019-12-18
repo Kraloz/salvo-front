@@ -194,26 +194,21 @@ const actions = {
   },
 
   fixShipsAndCommit({ commit }, payload) {
-    if(!payload.locations) {
+    if(!payload.ships) {
       commit('SET_CURRENT_GAME', payload)
       return
     }
+    const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'})
+    payload.ships.forEach(ship => {
+      console.log('sorted!')
+      ship.locations.sort(collator.compare)
+      console.log(ship.locations)
+    })
+
+    commit('SET_CURRENT_GAME', payload)
+    return
     
-
-    if(payload.locations.reduce((prev,next) => prev[0]==next[0])) {
-      payload.locations.sort()
-      commit('SET_CURRENT_GAME', payload)
-    } else {
-      const lococations = payload.locations.map(location =>{
-        const [y, ...x] = location
-        return [y, x]
-      })
-      /// hay que hacer un join por acá
-      console.log('lococations',lococations)
-      commit('SET_CURRENT_GAME', payload)
-    }
-},
-
+  },
   // eslint-disable-next-line no-unused-vars
   async sendShipsLocations({ state }, {gameId, locations}) {
     return await ApiService.post(`/api/games/${state.currentGame.id}/ships`, locations)

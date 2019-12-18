@@ -105,12 +105,12 @@ export default {
     populateShips() {
       if (Array.isArray(this.ships) && this.ships.length>0) {
         this.ships.forEach(ship => {
-          console.log(ship.locations)
+          // console.log(ship.locations)
           battleship.createShips(
             ship.type.toLowerCase(),
             ship.locations.length,
-            this.whatOrientation(ship.locations.sort()),
-            document.getElementById(`ships${ship.locations.sort()[0]}`),
+            this.whatOrientation(ship.locations),
+            document.getElementById(`ships${ship.locations[0]}`),
             true
           )
         })
