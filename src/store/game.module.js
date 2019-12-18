@@ -172,27 +172,43 @@ const actions = {
     }
   },
   
-  async fetchGameData({ commit }, payload) {
+  async fetchGameData({ commit, dispatch }, payload) {
     commit('CLEAR_CURRENT_GAME')
     try {
       const response = await ApiService.get(`/api/games/${payload}/game_view`)
-      commit('SET_CURRENT_GAME', response.data)
+      dispatch('fixShipsAndCommit', response.data)
+      // commit('SET_CURRENT_GAME', response.data)
       router.push('/game')
-      
     } catch (error) {
       console.error(error)
     }
   },
-  
-  async refreshGameData({ commit, state }) {
+
+  async refreshGameData({ dispatch, state }) {
     try {
       const response = await ApiService.get(`/api/games/${state.currentGame.id}/game_view`)
-      commit('SET_CURRENT_GAME', response.data)
+      dispatch('fixShipsAndCommit', response.data)
     } catch (error) {
       console.error(error)
     }
   },
-  
+
+  fixShipsAndCommit({ commit }, payload) {
+    if(!payload.ships) {
+      commit('SET_CURRENT_GAME', payload)
+      return
+    }
+    const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'})
+    payload.ships.forEach(ship => {
+      console.log('sorted!')
+      ship.locations.sort(collator.compare)
+      console.log(ship.locations)
+    })
+
+    commit('SET_CURRENT_GAME', payload)
+    return
+    
+  },
   // eslint-disable-next-line no-unused-vars
   async sendShipsLocations({ state }, {gameId, locations}) {
     return await ApiService.post(`/api/games/${state.currentGame.id}/ships`, locations)
